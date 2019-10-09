@@ -1,5 +1,5 @@
 # Fairmont State University SARP Project 2018-2019
-This repository contains a deliverable associated with the Fairmont State University grant from the NASA Software Assurance Research Program in academic year 2018-2019. The professors involved in this grant were [Dr. Brian Blackwood](https://www.fairmontstate.edu/collegeofscitech/dr-brian-blackwood), [Dr. Tom Cuchta](http://tomcuchta.com), [Thomas Devine](https://www.fairmontstate.edu/collegeofscitech/thomas-devine), and [Dr. Robert J. Niichel](https://www.fairmontstate.edu/collegeofscitech/robert-niichel). Below, we detail the contents of this repository.
+This repository contains a deliverable associated with the Fairmont State University grant from the NASA Software Assurance Research Program in academic year 2018-2019. The professors involved in this grant were Dr. Brian Blackwood, [Dr. Tom Cuchta](http://tomcuchta.com), Thomas R. Devine, and Dr. Robert J. Niichel. Below, we detail the contents of this repository.
 
 ## /data
 These files are .csv files containing the raw database dumps from the project. IP addresses and other identifying information of the subjects have been removed. Rows in the data, including rows used for testing during development and those from malicious attacks on our servers have not been removed from these files.
