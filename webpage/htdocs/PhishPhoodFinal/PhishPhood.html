@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+
+var myGamePiece;
+var myBackground;
+var myObstacle;
+var myObstacle2;
+var myObstacle3;
+var myObstacle4;
+var myObstacle5;
+
+function startGame()
+{
+    myBackground = new component(720, 405, "fishbowl2.jpg", 0, 0, "image");
+    myGamePiece = new component(150, 150, "final.png", 10, 120, "image");
+
+    myObstacle  = new component(300, 70, "whRussia.gif", 722, 120, "image");
+    myObstacle2  = new component(200, 70, "amazon.gif", 722, 1, "image");
+    myObstacle3  = new component(200, 70, "fafsa.gif", 722, 200, "image");
+    myObstacle4  = new component(300, 70, "facebook.gif", 722, 270, "image");
+    myObstacle5  = new component(100, 100, "UScraBy.png", 722, 320, "image");
+
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function()
+    {
+        this.canvas.width = 720;
+        this.canvas.height = 405;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        this.interval = setInterval(updateGameArea, 10);
+    },
+    clear : function()
+    {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    },
+    stop : function()
+    {
+        clearInterval(this.interval);
+    }
+}
+
+function component(width, height, color, x, y, type)
+{
+	var beenPlayed;
+    this.type = type;
+    if (type == "image")
+    {
+        this.image = new Image();
+        this.image.src = color;
+    }
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;
+    this.x = x;
+    this.y = y;
+    beenPlayed = 0;
+    this.update = function()
+    {
+        ctx = myGameArea.context;
+        if (type == "image")
+        {
+            ctx.drawImage(this.image,
+            this.x,
+            this.y,
+            this.width, this.height);
+        }
+    }
+
+ 	this.newPos = function()
+    {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+	 	if(this.height == 150)
+		{
+	        this.hitBottom();
+	        this.hitTop();
+	        this.hitLeft();
+	        this.hitRight();
+	 	}
+ 	}
+	this.hitBottom = function()
+	{
+		var rockbottom = myGameArea.canvas.height - this.height;
+		if(this.y > rockbottom)
+		{
+			this.y = rockbottom;
+    		myGamePiece.speedY = -1;
+		}
+	}
+
+	this.hitLeft = function()
+	{
+		var left = 0;
+		if(this.x < left)
+		{
+			this.x = left;
+    		myGamePiece.speedX = 1;
+		    myGamePiece.image.src = "final.png";
+		}
+	}
+
+	this.hitRight = function()
+	{
+		var right = myGameArea.canvas.width- this.width;
+		if(this.x > right)
+		{
+			this.x = right;
+    		myGamePiece.speedX = -1;
+    		myGamePiece.image.src = "finalLeft.png";
+		}
+	}
+	this.hitTop = function()
+	{
+		var top = 0;
+		if(this.y < top)
+		{
+			this.y = top;
+    		myGamePiece.speedY = 1;
+		}
+	}
+    this.crashWith = function(otherobj)
+    {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop+20) || (mytop > otherbottom) || (myright < otherleft+20) || (myleft > otherright))
+        {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+function updateGameArea()
+{
+    if (myGamePiece.crashWith(myObstacle))
+    {
+    		myBackground.image.src = "YouGotPhished.jpg";
+	  		myBackground.newPos();
+	    	myBackground.update();
+			myObstacle.x = myGamePiece.x + myGamePiece.width-3;
+			myObstacle.y += -3;
+
+	    	myGamePiece.image.src = "dead.png";
+	    	myGamePiece.speedY = -3;
+	 	   	if(myGamePiece.y == 1)
+	 	   	{
+				myGamePiece.speedY = 0;
+				myObstacle.y = 0;
+	 	   	}
+	 	   	myGamePiece.speedX = 0;
+	    	myGamePiece.newPos();
+	    	myObstacle.newPos();
+	    	myObstacle.update();
+	    	myGamePiece.update();
+			setTimeout(function()
+						{
+							myGameArea.stop();
+						}, 6000);
+    }
+    else
+    {
+  		myBackground.newPos();
+  		myBackground.update();
+
+		myObstacle.x += -1;
+		if(myObstacle.width != 13 && myObstacle.x + myObstacle.width < 0)
+		{
+			myObstacle2.width = 300;
+			myObstacle2.height = 70;
+			myObstacle2.x += -1;
+		    myObstacle2.newPos();
+		    myObstacle2.update();
+		    myObstacle.width = 13;
+		}
+
+	    myGamePiece.newPos();
+	    myGamePiece.update();
+	}
+    if (myGamePiece.crashWith(myObstacle2))
+    {
+    	myGamePiece.image.src = "YumRight.png";
+    	myGamePiece.width = 300;
+
+		myObstacle2.width = 0;
+		myObstacle2.height = 0;
+		myObstacle2.beenPlayed = 1;
+		setTimeout(function()
+		{
+			myGamePiece.image.src = "final.png";
+			myGamePiece.width = 150;
+		}, 1000);
+
+	 	myBackground.newPos();
+	   	myBackground.update();
+		myObstacle2.x += -1000;
+	   	myGamePiece.newPos();
+	   	myObstacle2.newPos();
+	   	myObstacle2.update();
+	   	myGamePiece.update();
+	   	crash = false;
+    }
+    else
+    {
+  		myBackground.newPos();
+  		myBackground.update();
+		if(myObstacle.x + myObstacle.width < 0)
+		{
+			if(myObstacle2.beenPlayed == 0)
+			{
+				myObstacle2.width = 300;
+				myObstacle2.height = 70;
+				myObstacle2.beenPlayed = 1;
+			}
+			myObstacle2.x += -1;
+		    myObstacle2.newPos();
+		    myObstacle2.update();
+		}
+
+		if(myObstacle2.width == 0 || myObstacle2.x + myObstacle2.width < 0)
+		{
+			myObstacle3.width = 400;
+			myObstacle3.height = 70;
+			myObstacle3.x += -1;
+		    myObstacle3.newPos();
+		    myObstacle3.update();
+		}
+
+	    myGamePiece.newPos();
+	    myObstacle.newPos();
+	    myObstacle.update();
+	    myGamePiece.update();
+
+	if (myGamePiece.crashWith(myObstacle3))
+    {
+    	myGamePiece.image.src = "YumRight.png";
+    	myGamePiece.width = 300;
+
+		myObstacle3.width = 0;
+		myObstacle3.height = 0;
+		myObstacle3.beenPlayed = 1;
+		setTimeout(function()
+		{
+			myGamePiece.image.src = "final.png";
+			myGamePiece.width = 150;
+		}, 1000);
+
+	 	myBackground.newPos();
+	   	myBackground.update();
+		myObstacle3.x += -1000;
+	   	myGamePiece.newPos();
+	   	myObstacle3.newPos();
+	   	myObstacle3.update();
+	   	myGamePiece.update();
+	   	crash = false;
+    }
+    else
+    {
+    	if(myObstacle3.width == 0 || myObstacle3.x + myObstacle3.width < 0)
+		{
+			myObstacle4.x += -1;
+			myObstacle4.newPos();
+			myObstacle4.update();
+			myObstacle3.width = 13;
+		}
+
+    }
+    if (myGamePiece.crashWith(myObstacle4))
+    {
+    		myBackground.image.src = "YouGotPhished.jpg";
+	  		myBackground.newPos();
+	    	myBackground.update();
+			myObstacle4.x = myGamePiece.x + myGamePiece.width-3;
+			myObstacle4.y += -3;
+
+	    	myGamePiece.image.src = "dead.png";
+	    	myGamePiece.speedY = -3;
+	 	   	if(myGamePiece.y == 1)
+	 	   	{
+				myGamePiece.speedY = 0;
+				myObstacle4.y = 0;
+	 	   	}
+	 	   	myGamePiece.speedX = 0;
+	    	myGamePiece.newPos();
+	    	myObstacle4.newPos();
+	    	myObstacle4.update();
+	    	myGamePiece.update();
+			setTimeout(function()
+					{
+						myGameArea.stop();
+					}, 6000);
+    }
+    else
+    {
+		if(myObstacle4.width == 0 || myObstacle4.x + myObstacle4.width < 0)
+		{
+			myObstacle5.x += -1;
+			myObstacle5.newPos();
+			myObstacle5.update();
+		}
+	}
+    if (myGamePiece.crashWith(myObstacle5))
+    {
+    		myBackground.image.src = "YouGotPhished.jpg";
+	  		myBackground.newPos();
+	    	myBackground.update();
+			myObstacle5.x = myGamePiece.x + myGamePiece.width-3;
+			myObstacle5.y += -3;
+
+	    	myGamePiece.image.src = "dead.png";
+	    	myGamePiece.speedY = -3;
+	 	   	if(myGamePiece.y == 1)
+	 	   	{
+				myGamePiece.speedY = 0;
+				myObstacle5.y = 0;
+	 	   	}
+	 	   	myGamePiece.speedX = 0;
+	    	myGamePiece.newPos();
+	    	myObstacle5.newPos();
+	    	myObstacle5.update();
+	    	myGamePiece.update();
+			setTimeout(function()
+					{
+						myGameArea.stop();
+					}, 6000);
+    }
+    else
+    {
+		if(myObstacle5.x + myObstacle4.width < 0)
+		{
+    		myBackground.image.src = "congrats.jpg";
+	  		myBackground.newPos();
+	    	myBackground.update();
+
+			setTimeout(function()
+					{
+						myGameArea.stop();
+					}, 3000);
+		}
+	}
+
+}
+
+}
+function moveup()
+{
+    myGamePiece.speedY = -1;
+}
+
+function movedown()
+{
+    myGamePiece.speedY = 1;
+}
+
+function moveleft()
+{
+    myGamePiece.image.src = "finalLeft.png";
+    myGamePiece.speedX = -1;
+}
+
+function moveright()
+{
+	myGamePiece.image.src = "final.png";
+    myGamePiece.speedX = 1;
+}
+
+function clearmove()
+{
+    myGamePiece.speedX = 0;
+    myGamePiece.speedY = 0;
+}
+</script>
+<div style="text-align:center;width:480px;">
+  <button onmousedown="moveup()" onmouseup="" ontouchstart="moveup()">UP</button><br><br>
+  <button onmousedown="moveleft()" onmouseup="" ontouchstart="moveleft()">LEFT</button>
+  <button onmousedown="moveright()" onmouseup="" ontouchstart="moveright()">RIGHT</button><br><br>
+  <button onmousedown="movedown()" onmouseup="" ontouchstart="movedown()">DOWN</button>
+</div>
+
+</body>
+</html>
